@@ -125,3 +125,29 @@ expect()->extend('toHaveErrors', function (array $errors) {
 
     return $this;
 });
+
+/**
+ * @param ResponseInterface $response A server response instance from a GraphQL API
+ * @param string            $path     A dot-delimited string of fields ("dot notation") that point to a value in the response
+ * @param mixed             $value    An optional value to assert at the given path, should it exist
+ *
+ * @return TestCase|TestCall
+ */
+function toHavePath($response, string $path, $value = null)
+{
+    if (func_num_args() > 2) {
+        return test()->toHavePath($response, $path, $value);
+    }
+
+    return test()->toHavePath($response, $path);
+}
+
+expect()->extend('toHavePath', function (string $path, $value = null) {
+    if (func_num_args() > 1) {
+        toHavePath($this->value, $path, $value);
+    } else {
+        toHavePath($this->value, $path);
+    }
+
+    return $this;
+});

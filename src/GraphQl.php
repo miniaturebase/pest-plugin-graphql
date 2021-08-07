@@ -48,7 +48,6 @@ trait GraphQl
              */
             $this->schema($document)
                 ->toHaveType('Query')
-                ->toHaveType('Mutation')
                 ->assertValid();
         } catch (InvariantViolation $caught) {
             throw new ExpectationFailedException($caught->getMessage(), null, $caught);
@@ -63,6 +62,11 @@ trait GraphQl
      */
     public function toHaveType($document, string $type): TestCase
     {
+        if (class_exists($type)) {
+            $namespace = explode('\\', $type);
+            $type      = end($namespace);
+        }
+
         try {
             /**
              * @var self|TestCase $this
@@ -130,7 +134,7 @@ trait GraphQl
             ->json()
             ->toHaveKey('data')
             ->data
-            ->toBe($data);
+            ->toEqualCanonicalizing($data);
 
         return $this;
     }
@@ -152,7 +156,28 @@ trait GraphQl
             ->json()
             ->toHaveKey('errors')
             ->errors
-            ->toBe($errors);
+            ->toEqualCanonicalizing($errors);
+
+        return $this;
+    }
+
+    public function toHavePath($response, string $path, $value = null): TestCase
+    {
+        expect($response)->toBeGraphQlResponse();
+
+        /**
+         * @var self|TestCase $this
+         */
+        $body = $response->getBody();
+
+        $body->rewind();
+
+        expect($body->getContents())
+            ->json()
+            ->toHaveKey(...array_filter([
+                sprintf('data.%s', $path),
+                (func_num_args() > 2) ? $value : null,
+            ]));
 
         return $this;
     }

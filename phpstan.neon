@@ -10,6 +10,7 @@ parameters:
     ignoreErrors:
         - '#Undefined variable: \$this#'
         - '#Variable \$this in PHPDoc tag @var does not exist.#'
+        - '#Function Pest\\GraphQl\\toHavePath\(\) has parameter \$value with null as default value.#'
     checkMissingIterableValueType: true
     checkGenericClassInNonGenericObjectType: false
     reportUnmatchedIgnoredErrors: true

@@ -28,19 +28,29 @@ it('asserts response errors')
     ->toBeGraphQlResponse()
     ->toHaveErrors([
         [
-            'message'   => 'asdf',
             'locations' => [['line' => 6, 'column' => 7]],
+            'message'   => 'asdf',
             'path'      => ['foo'],
         ],
     ])
     ->not()
     ->toHaveErrors([
         [
-            'message'   => 'qwerty',
             'locations' => [['line' => 6, 'column' => 7]],
+            'message'   => 'qwerty',
             'path'      => ['foo'],
         ],
     ]);
+
+test('path checks')
+    ->expect(new JsonResponse(['data' => ['foo' => []]]))
+    ->toHavePath('foo')
+    ->and(new JsonResponse(['data' => ['jah' => ['ith' => ['ber' => 'enigma']]]]))
+    ->toHavePath('jah.ith.ber', 'enigma')
+    ->not()
+    ->toHavePath('foo.bar.baz')
+    ->not()
+    ->toHavePath('jah.ith.ber', 'ligma');
 
 test('resolvers');
 test('deferred');
