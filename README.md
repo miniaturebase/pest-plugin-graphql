@@ -1,9 +1,11 @@
-This repository contains the Pest Plugin Template.
+# Pest GraphQL Plugin
 
-> If you want to start testing your application with Pest, visit the main **[Pest Repository](https://github.com/pestphp/pest)**.
+Test your GraphQL API in style, with Pest!
 
-- Explore the docs: **[pestphp.com/docs/plugins/creating-plugins »](https://pestphp.com/docs/plugins/creating-plugins)**
-- Follow us on Twitter: **[@pestphp »](https://twitter.com/pestphp)**
-- Join us on the Discord Server: **[discord.gg/bMAJv82 »](https://discord.gg/bMAJv82)**
+_WIP (read the tests for now)_
+
+---
+
+This repository was based off of the Pest Plugin Template.
 
 Pest was created by **[Nuno Maduro](https://twitter.com/enunomaduro)** under the **[Sponsorware license](https://github.com/sponsorware/docs)**. It got open-sourced and is now licensed under the **[MIT license](https://opensource.org/licenses/MIT)**.

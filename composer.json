@@ -1,6 +1,6 @@
 {
-    "name": "pestphp/pest-plugin-template",
-    "description": "My awesome plugin",
+    "name": "miniaturebase/pest-plugin-graphql",
+    "description": "Test your PHP GraphQL server in style, with Pest!",
     "keywords": [
         "php",
         "framework",
@@ -8,23 +8,27 @@
         "unit",
         "test",
         "testing",
-        "plugin"
+        "plugin",
+        "graphql"
     ],
     "license": "MIT",
     "require": {
         "php": "^7.3 || ^8.0",
         "pestphp/pest": "^1.0",
-        "pestphp/pest-plugin": "^1.0"
+        "pestphp/pest-plugin": "^1.0",
+        "psr/http-message": "^1.0",
+        "webonyx/graphql-php": "^14.9"
     },
     "autoload": {
         "psr-4": {
-            "Pest\\PluginName\\": "src/"
+            "Pest\\GraphQl\\": "src/"
         },
         "files": [
             "src/Autoload.php"
         ]
     },
     "require-dev": {
+        "laminas/laminas-diactoros": "^2.6",
         "pestphp/pest-dev-tools": "dev-master"
     },
     "extra": {

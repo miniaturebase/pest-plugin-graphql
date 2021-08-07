@@ -1,0 +1,11 @@
+type Query {
+    rand: Int!
+}
+
+type Mutation {
+    sum(numbers: [Int!]!): Int!
+}
+
+type Foo {
+    x: String
+}
