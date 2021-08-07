@@ -23,24 +23,29 @@ trait GraphQl
     /**
      * Get an instance of a GraphQL schema.
      *
-     * @param string|Schema|null $document File path to a GraphQL schema document
+     * @param string|Schema $document Schema file path or document instance
      */
-    public function schema($document = null): Expectation
+    public function schema($document = ''): Expectation
     {
         if ($document instanceof Schema) {
             return expect($document);
         }
 
-        $source = $document ?? TestSuite::getInstance()->rootPath . '/schema.graphql';
+        $source = empty($document) ? TestSuite::getInstance()->rootPath . '/schema.graphql' : $document;
 
         return expect(BuildSchema::build(is_file($source) ? file_get_contents($source) : $source))
             ->toBeInstanceOf(Schema::class);
     }
 
+    /**
+     * @param string|Schema|null $document Schema file path or document instance
+     */
     public function isValidSdl($document): TestCase
     {
         try {
-            /** @var self|TestCase $this */
+            /**
+             * @var self|TestCase $this
+             */
             $this->schema($document)
                 ->toHaveType('Query')
                 ->toHaveType('Mutation')
@@ -52,10 +57,16 @@ trait GraphQl
         return $this;
     }
 
+    /**
+     * @param string|Schema|null $document Schema file path or document instance
+     * @param string             $type     The name of the type as defined in the schema document
+     */
     public function toHaveType($document, string $type): TestCase
     {
         try {
-            /** @var self|TestCase $this */
+            /**
+             * @var self|TestCase $this
+             */
             $this->schema($document)
                 ->toBeInstanceOf(Schema::class)
                 ->getType($type)
@@ -67,9 +78,14 @@ trait GraphQl
         return $this;
     }
 
+    /**
+     * @param ResponseInterface $response A server response instance from a GraphQL API
+     */
     public function toBeGraphQlResponse($response): TestCase
     {
-        /** @var self|TestCase $this */
+        /**
+         * @var self|TestCase $this
+         */
         expect($response)
             ->toBeInstanceOf(ResponseInterface::class)
             ->getStatusCode()
@@ -79,7 +95,6 @@ trait GraphQl
             ->getHeaderLine('content-type')
             ->toContain('json');
 
-        /** @var ResponseInterface $response */
         $body = $response->getBody();
 
         $body->rewind();
@@ -98,11 +113,14 @@ trait GraphQl
         return $this;
     }
 
+    /**
+     * @param ResponseInterface    $response A server response instance from a GraphQL API
+     * @param array<string, mixed> $data     A blob of data to assert as the response
+     */
     public function toHaveData($response, array $data): TestCase
     {
         /**
          * @var self|TestCase $this
-         * @var ResponseInterface $response
          */
         $body = $response->getBody();
 
@@ -117,11 +135,14 @@ trait GraphQl
         return $this;
     }
 
+    /**
+     * @param ResponseInterface $response A server response instance from a GraphQL API
+     * @param array<int, array> $errors   A blob of errors to assert within the response
+     */
     public function toHaveErrors($response, array $errors): TestCase
     {
         /**
          * @var self|TestCase $this
-         * @var ResponseInterface $response
          */
         $body = $response->getBody();
 
