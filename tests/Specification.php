@@ -5,24 +5,6 @@ declare(strict_types=1);
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
 
-it('reads schemas')
-    ->schema()
-    ->isValidSdl()
-    ->schema(__DIR__ . '/../schema.graphql')
-    ->isValidSdl()
-    ->schema(<<<'GRAPHQL'
-type Query
-type Mutation
-GRAPHQL)
-    ->not()
-    ->isValidSdl();
-
-it('checks types')
-    ->schema()
-    ->toHaveType('Foo')
-    ->not()
-    ->toHaveType(substr(base64_encode(random_bytes(8)), 0, rand(1, 64)));
-
 it('asserts response data')
     ->expect(new JsonResponse(['data' => ['foo' => true]]))
     ->toBeGraphQlResponse()
@@ -59,3 +41,6 @@ it('asserts response errors')
             'path'      => ['foo'],
         ],
     ]);
+
+test('resolvers');
+test('deferred');

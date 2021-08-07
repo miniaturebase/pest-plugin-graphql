@@ -2,7 +2,6 @@
 
 use GraphQL\Utils\BuildSchema;
 use Laminas\Diactoros\Response\JsonResponse;
-
 use function Pest\GraphQl\isValidSdl;
 use function Pest\GraphQl\schema;
 use function Pest\GraphQl\toBeGraphQlResponse;
