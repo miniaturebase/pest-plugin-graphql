@@ -7,7 +7,9 @@ parameters:
     level: max
     paths:
         - src
-
+    ignoreErrors:
+        - '#Undefined variable: \$this#'
+        - '#Variable \$this in PHPDoc tag @var does not exist.#'
     checkMissingIterableValueType: true
     checkGenericClassInNonGenericObjectType: false
     reportUnmatchedIgnoredErrors: true
