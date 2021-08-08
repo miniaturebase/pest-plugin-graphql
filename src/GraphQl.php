@@ -24,8 +24,10 @@ trait GraphQl
      * Get an instance of a GraphQL schema.
      *
      * @param string|Schema $document Schema file path or document instance
+     *
+     * @return Expectation
      */
-    public function schema($document = ''): Expectation
+    public function schema($document = '')
     {
         /**
          * @var self|TestCase $this
@@ -34,10 +36,15 @@ trait GraphQl
             return expect($document);
         }
 
-        $source = empty($document) ? TestSuite::getInstance()->rootPath . '/schema.graphql' : $document;
+        $source = empty($document)
+            ? TestSuite::getInstance()->rootPath . '/schema.graphql'
+            : $document;
 
-        return expect(BuildSchema::build(is_file($source) ? file_get_contents($source) : $source))
-            ->toBeInstanceOf(Schema::class);
+        return expect(BuildSchema::build(
+            is_file($source) ? file_get_contents($source) : $source
+        ))->toBeInstanceOf(
+            Schema::class
+        );
     }
 
     /**
@@ -105,13 +112,17 @@ trait GraphQl
             ->toContain('json');
 
         $body = self::body($response);
-        $json = expect($body)->json();
 
-        $json
+        expect($body)->toBeJson();
+
+        $json = json_decode($body, true);
+
+        expect($json)
+            // TODO: assert keys
             ->each(static function (Expectation $value): Expectation {
                 return $value->toBeArray();
             })
-            ->and(count($json->value))
+            ->and(count($json))
             ->toBeLessThanOrEqual(2);
 
         return $this;
@@ -128,10 +139,15 @@ trait GraphQl
          */
         expect($response)->toBeGraphQlResponse();
 
-        $json = expect(self::body($response))->json();
+        $body = self::body($response);
 
-        $json->toHaveKey('data')
-            ->and($json->value['data'])
+        expect($body)->toBeJson();
+
+        $json = json_decode($body, true);
+
+        expect($json)
+            ->toHaveKey('data')
+            ->and($json['data'])
             ->toEqualCanonicalizing($data);
 
         return $this;
@@ -148,10 +164,15 @@ trait GraphQl
          */
         expect($response)->toBeGraphQlResponse();
 
-        $json = expect(self::body($response))->json();
+        $body = self::body($response);
 
-        $json->toHaveKey('errors')
-            ->and($json->value['errors'])
+        expect($body)->toBeJson();
+
+        $json = json_decode($body, true);
+
+        expect($json)
+            ->toHaveKey('errors')
+            ->and($json['errors'])
             ->toEqualCanonicalizing($errors);
 
         return $this;
@@ -167,10 +188,13 @@ trait GraphQl
         /**
          * @var self|TestCase $this
          */
-        expect($response)
-            ->toBeGraphQlResponse()
-            ->and(self::body($response))
-            ->json()
+        expect($response)->toBeGraphQlResponse();
+
+        $body = self::body($response);
+
+        expect($body)
+            ->toBeJson()
+            ->and(json_decode($body, true))
             ->toHaveKey(...array_filter([
                 sprintf('data.%s', $path),
                 (func_num_args() > 2) ? $value : null,
