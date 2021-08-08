@@ -6,7 +6,13 @@ namespace Pest\GraphQl;
 
 use GraphQL\Error\Error;
 use GraphQL\Error\InvariantViolation;
+use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\InputType;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\BuildSchema;
 use Pest\Expectation;
@@ -67,6 +73,34 @@ trait GraphQl
     }
 
     /**
+     * @param string|Schema|null $document  Schema file path or document instance
+     * @param string             $interface The name of the interface as defined in the schema document
+     */
+    public function toHaveInterface($document, string $interface): TestCase
+    {
+        /**
+         * @var self|TestCase $this
+         */
+        if (class_exists($interface)) {
+            $namespace      = explode('\\', $interface);
+            $interface      = end($namespace);
+        }
+
+        $schema = $this->schema($document);
+
+        try {
+            $schema
+                ->toBeInstanceOf(Schema::class)
+                ->and($schema->value->getType($interface))
+                ->toBeInstanceOf(Type::class);
+        } catch (Error $caught) {
+            throw new ExpectationFailedException($caught->getMessage(), null, $caught);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param string|Schema|null $document Schema file path or document instance
      * @param string             $type     The name of the type as defined in the schema document
      */
@@ -86,7 +120,147 @@ trait GraphQl
             $schema
                 ->toBeInstanceOf(Schema::class)
                 ->and($schema->value->getType($type))
-                ->toBeInstanceOf(Type::class);
+                ->toBeInstanceOf(ObjectType::class);
+        } catch (Error $caught) {
+            throw new ExpectationFailedException($caught->getMessage(), null, $caught);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|Schema|null $document  Schema file path or document instance
+     * @param string             $directive The name of the directive as defined in the schema document
+     */
+    public function toHaveDirective($document, string $directive): TestCase
+    {
+        /**
+         * @var self|TestCase $this
+         */
+        if (class_exists($directive)) {
+            $namespace      = explode('\\', $directive);
+            $directive      = end($namespace);
+        }
+
+        $schema = $this->schema($document);
+
+        try {
+            $schema
+                ->toBeInstanceOf(Schema::class)
+                ->and($schema->value->getDirective($directive))
+                ->toBeInstanceOf(Directive::class);
+        } catch (Error $caught) {
+            throw new ExpectationFailedException($caught->getMessage(), null, $caught);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|Schema|null $document Schema file path or document instance
+     * @param string             $union    The name of the union as defined in the schema document
+     */
+    public function toHaveUnion($document, string $union): TestCase
+    {
+        /**
+         * @var self|TestCase $this
+         */
+        if (class_exists($union)) {
+            $namespace      = explode('\\', $union);
+            $union          = end($namespace);
+        }
+
+        $schema = $this->schema($document);
+
+        try {
+            $schema
+                ->toBeInstanceOf(Schema::class)
+                ->and($schema->value->getType($union))
+                ->toBeInstanceOf(UnionType::class);
+        } catch (Error $caught) {
+            throw new ExpectationFailedException($caught->getMessage(), null, $caught);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|Schema|null $document Schema file path or document instance
+     * @param string             $input    The name of the input as defined in the schema document
+     */
+    public function toHaveInput($document, string $input): TestCase
+    {
+        /**
+         * @var self|TestCase $this
+         */
+        if (class_exists($input)) {
+            $namespace      = explode('\\', $input);
+            $input          = end($namespace);
+        }
+
+        $schema = $this->schema($document);
+
+        try {
+            $schema
+                ->toBeInstanceOf(Schema::class)
+                ->and($schema->value->getType($input))
+                ->toBeInstanceOf(InputType::class);
+        } catch (Error $caught) {
+            throw new ExpectationFailedException($caught->getMessage(), null, $caught);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|Schema|null $document Schema file path or document instance
+     * @param string             $enum     The name of the enum as defined in the schema document
+     */
+    public function toHaveEnum($document, string $enum): TestCase
+    {
+        /**
+         * @var self|TestCase $this
+         */
+        if (class_exists($enum)) {
+            $namespace      = explode('\\', $enum);
+            $enum           = end($namespace);
+        }
+
+        $schema = $this->schema($document);
+
+        try {
+            $schema
+                ->toBeInstanceOf(Schema::class)
+                ->and($schema->value->getType($enum))
+                ->toBeInstanceOf(EnumType::class);
+        } catch (Error $caught) {
+            throw new ExpectationFailedException($caught->getMessage(), null, $caught);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|Schema|null $document Schema file path or document instance
+     * @param string             $scalar   The name of the scalar as defined in the schema document
+     */
+    public function toHaveScalar($document, string $scalar): TestCase
+    {
+        /**
+         * @var self|TestCase $this
+         */
+        if (class_exists($scalar)) {
+            $namespace      = explode('\\', $scalar);
+            $scalar         = end($namespace);
+        }
+
+        $schema = $this->schema($document);
+
+        try {
+            $schema
+                ->toBeInstanceOf(Schema::class)
+                ->and($schema->value->getType($scalar))
+                ->toBeInstanceOf(ScalarType::class);
         } catch (Error $caught) {
             throw new ExpectationFailedException($caught->getMessage(), null, $caught);
         }

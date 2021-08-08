@@ -12,7 +12,13 @@ Test your GraphQL API in style, with Pest!
 
 - `schema(string|Schema $document)`
 - `isValidSdl()`
+- `toHaveDirective(string $directive)`
+- `toHaveEnum(string $enum)`
+- `toHaveInput(string $input)`
+- `toHaveInterface(string $interface)`
+- `toHaveScalar(string $scalar)`
 - `toHaveType(string $type)`
+- `toHaveUnion(string $union)`
 - `toBeGraphQlResponse()`
 - `toHavePath(string $path, $value = null)`
 - `toHaveData(array $data)`
@@ -52,16 +58,68 @@ Assert that the schema is valid and written to the GraphQL specification.
 it('validates your schema')->schema()->isValidSdl();
 ```
 
+#### `toHaveDirective(string $directive)`
+
+Assert that the given directive definition exists with the schema document.
+
+```php
+it('has a directive')->schema()->toHaveDirective('auth')
+it('will also use base classnames')->schema()->toHaveDirective(Auth::class);
+```
+
+#### `toHaveEnum(string $enum)`
+
+Assert that the given enum definition exists with the schema document.
+
+```php
+it('has an enum')->schema()->toHaveEnum('Status')
+it('will also use base classnames')->schema()->toHaveEnum(Status::class);
+```
+
+#### `toHaveInput(string $input)`
+
+Assert that the given input definition exists with the schema document.
+
+```php
+it('has a input')->schema()->toHaveInput('Message')
+it('will also use base classnames')->schema()->toHaveInput(Message::class);
+```
+
+#### `toHaveInterface(string $interface)`
+
+Assert that the given interface definition exists with the schema document.
+
+```php
+it('has a interface')->schema()->toHaveInterface('Notification')
+it('will also use base classnames')->schema()->toHaveInterface(Notification::class);
+```
+
+#### `toHaveScalar(string $scalar)`
+
+Assert that the given scalar definition exists with the schema document.
+
+```php
+it('has a scalar')->schema()->toHaveScalar('Date')
+it('will also use base classnames')->schema()->toHaveScalar(Date::class);
+```
+
 #### `toHaveType(string $type)`
 
-Assert that the given type has been defined within the schema document.
-
-> **Note:** that enums, unions, etc. are all types, _except_ directives.
+Assert that the given (object) type has been defined within the schema document.
 
 ```php
 it('has mutations')->schema()->toHaveType('Mutation');
 test('user defined types too')->schema()->toHaveType('User');
 it('will also use your base classnames')->schema()->toHaveType(User::class);
+```
+
+#### `toHaveUnion(string $union)`
+
+Assert that the given union definition exists with the schema document.
+
+```php
+it('has a union')->schema()->toHaveUnion('Character')
+it('will also use your base classnames')->schema()->toHaveUnion(Character::class);
 ```
 
 #### `toBeGraphQlResponse()`

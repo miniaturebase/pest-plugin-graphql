@@ -53,6 +53,44 @@ expect()->extend('isValidSdl', function () {
  *
  * @return TestCase|TestCall
  */
+function toHaveUnion($document, string $type)
+{
+    return test()->toHaveUnion($document, $type);
+}
+
+expect()->extend('toHaveUnion', function (string $type) {
+    /**
+     * @var Expectation $this
+     */
+    toHaveUnion($this->value, $type);
+
+    return $this;
+});
+
+/**
+ * @param string|Schema|null $document Schema file path or document instance
+ *
+ * @return TestCase|TestCall
+ */
+function toHaveDirective($document, string $type)
+{
+    return test()->toHaveDirective($document, $type);
+}
+
+expect()->extend('toHaveDirective', function (string $type) {
+    /**
+     * @var Expectation $this
+     */
+    toHaveDirective($this->value, $type);
+
+    return $this;
+});
+
+/**
+ * @param string|Schema|null $document Schema file path or document instance
+ *
+ * @return TestCase|TestCall
+ */
 function toHaveType($document, string $type)
 {
     return test()->toHaveType($document, $type);
@@ -63,6 +101,82 @@ expect()->extend('toHaveType', function (string $type) {
      * @var Expectation $this
      */
     toHaveType($this->value, $type);
+
+    return $this;
+});
+
+/**
+ * @param string|Schema|null $document Schema file path or document instance
+ *
+ * @return TestCase|TestCall
+ */
+function toHaveScalar($document, string $scalar)
+{
+    return test()->toHaveScalar($document, $scalar);
+}
+
+expect()->extend('toHaveScalar', function (string $scalar) {
+    /**
+     * @var Expectation $this
+     */
+    toHaveScalar($this->value, $scalar);
+
+    return $this;
+});
+
+/**
+ * @param string|Schema|null $document Schema file path or document instance
+ *
+ * @return TestCase|TestCall
+ */
+function toHaveEnum($document, string $enum)
+{
+    return test()->toHaveEnum($document, $enum);
+}
+
+expect()->extend('toHaveEnum', function (string $enum) {
+    /**
+     * @var Expectation $this
+     */
+    toHaveEnum($this->value, $enum);
+
+    return $this;
+});
+
+/**
+ * @param string|Schema|null $document Schema file path or document instance
+ *
+ * @return TestCase|TestCall
+ */
+function toHaveInput($document, string $input)
+{
+    return test()->toHaveInput($document, $input);
+}
+
+expect()->extend('toHaveInput', function (string $input) {
+    /**
+     * @var Expectation $this
+     */
+    toHaveInput($this->value, $input);
+
+    return $this;
+});
+
+/**
+ * @param string|Schema|null $document Schema file path or document instance
+ *
+ * @return TestCase|TestCall
+ */
+function toHaveInterface($document, string $interface)
+{
+    return test()->toHaveInterface($document, $interface);
+}
+
+expect()->extend('toHaveInterface', function (string $interface) {
+    /**
+     * @var Expectation $this
+     */
+    toHaveInterface($this->value, $interface);
 
     return $this;
 });

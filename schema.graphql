@@ -9,3 +9,24 @@ type Mutation {
 type Foo {
     x: String
 }
+
+type Bar {
+    y: String
+}
+
+union BazUnion = Foo | Bar
+
+scalar Date
+
+input FooInput {
+    x: String!
+}
+
+interface FooInterface {
+    x: String
+}
+
+enum FooEnum {
+    Bar
+    Baz
+}
