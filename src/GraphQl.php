@@ -190,13 +190,12 @@ trait GraphQl
 
         $body = self::body($response);
 
-        expect($body)
-            ->toBeJson()
-            ->and(json_decode($body, true))
-            ->toHaveKey(...array_filter([
-                sprintf('data.%s', $path),
-                (func_num_args() > 2) ? $value : null,
-            ]));
+        expect($body)->toBeJson();
+
+        $this->toHaveKey(json_decode($body, true), ...array_filter([
+            sprintf('data.%s', $path),
+            (func_num_args() > 2) ? $value : null,
+        ]));
 
         return $this;
     }
@@ -218,5 +217,96 @@ trait GraphQl
         $body->rewind();
 
         return $payload;
+    }
+
+    /**
+     * @see https://github.com/pestphp/pest/blob/d1a9e0bbe31dcb266690dc4e7517e2cb73d5827a/src/Support/Arr.php
+     *
+     * @param array<mixed> $array
+     * @param string|int   $key
+     */
+    private static function has(array $array, $key): bool
+    {
+        $key = (string) $key;
+
+        if (array_key_exists($key, $array)) {
+            return true;
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (is_array($array) && array_key_exists($segment, $array)) {
+                $array = $array[$segment];
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @see https://github.com/pestphp/pest/blob/d1a9e0bbe31dcb266690dc4e7517e2cb73d5827a/src/Support/Arr.php
+     *
+     * @param array<mixed> $array
+     * @param string|int   $key
+     * @param null         $default
+     *
+     * @return array|mixed|null
+     */
+    private static function get(array $array, $key, $default = null)
+    {
+        $key = (string) $key;
+
+        if (array_key_exists($key, $array)) {
+            return $array[$key];
+        }
+
+        if (strpos($key, '.') === false) {
+            return $array[$key] ?? $default;
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (is_array($array) && array_key_exists($segment, $array)) {
+                $array = $array[$segment];
+            } else {
+                return $default;
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Asserts that the value array has the provided $key.
+     *
+     * @param string|int $key
+     * @param mixed      $value
+     *
+     * @see https://github.com/pestphp/pest/blob/30f39f18507b5d0ec69d738f197f99b490d9fce6/src/Expectation.php#L571-L600
+     */
+    private function toHaveKey($actual, $key, $value = null)
+    {
+        /**
+         * @var self|TestCase $this
+         */
+        if (is_object($actual) && method_exists($actual, 'toArray')) {
+            $array = $actual->toArray();
+        } else {
+            $array = (array) $actual;
+        }
+
+        try {
+            $this->assertTrue(self::has($array, $key));
+
+            /* @phpstan-ignore-next-line  */
+        } catch (ExpectationFailedException $exception) {
+            throw new ExpectationFailedException("Failed asserting that an array has the key '$key'", $exception->getComparisonFailure());
+        }
+
+        if (func_num_args() > 2) {
+            $this->assertEquals($value, self::get($array, $key));
+        }
+
+        return $this;
     }
 }
