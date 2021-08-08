@@ -2,6 +2,14 @@
 
 Test your GraphQL API in style, with Pest!
 
+## Installation
+
+Simply install through Composer!
+
+```bash
+composer require --dev miniaturebase/pest-plugin-graphql
+```
+
 ## What's Added?
 
 - Test your schema as code;
@@ -34,7 +42,7 @@ value.
 ```php
 test('my schema')->schema();
 it('is my schema')->schema();
-schema();
+Pest\GraphQl\schema();
 ```
 
 You can also provide an alternative schema path or document contents, like so.
