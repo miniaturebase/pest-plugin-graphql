@@ -135,19 +135,23 @@ expect()->extend('toHaveErrors', function (array $errors) {
  */
 function toHavePath($response, string $path, $value = null)
 {
-    if (func_num_args() > 2) {
-        return test()->toHavePath($response, $path, $value);
-    }
-
-    return test()->toHavePath($response, $path);
+    return test()->toHavePath(...array_filter([
+        $response,
+        $path,
+        (func_num_args() > 2) ? $value : null,
+    ], static function ($arg): bool {
+        return null !== $arg;
+    }));
 }
 
 expect()->extend('toHavePath', function (string $path, $value = null) {
-    if (func_num_args() > 1) {
-        toHavePath($this->value, $path, $value);
-    } else {
-        toHavePath($this->value, $path);
-    }
+    toHavePath(...array_filter([
+        $this->value,
+        $path,
+        (func_num_args() > 1) ? $value : null,
+    ], static function ($arg): bool {
+        return null !== $arg;
+    }));
 
     return $this;
 });

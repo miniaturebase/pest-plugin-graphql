@@ -27,6 +27,9 @@ trait GraphQl
      */
     public function schema($document = ''): Expectation
     {
+        /**
+         * @var self|TestCase $this
+         */
         if ($document instanceof Schema) {
             return expect($document);
         }
@@ -42,13 +45,13 @@ trait GraphQl
      */
     public function isValidSdl($document): TestCase
     {
+        /**
+         * @var self|TestCase $this
+         */
+        $schema = $this->schema($document)->toHaveType('Query');
+
         try {
-            /**
-             * @var self|TestCase $this
-             */
-            $this->schema($document)
-                ->toHaveType('Query')
-                ->assertValid();
+            $schema->value->assertValid();
         } catch (InvariantViolation $caught) {
             throw new ExpectationFailedException($caught->getMessage(), null, $caught);
         }
@@ -62,18 +65,20 @@ trait GraphQl
      */
     public function toHaveType($document, string $type): TestCase
     {
+        /**
+         * @var self|TestCase $this
+         */
         if (class_exists($type)) {
             $namespace = explode('\\', $type);
             $type      = end($namespace);
         }
 
+        $schema = $this->schema($document);
+
         try {
-            /**
-             * @var self|TestCase $this
-             */
-            $this->schema($document)
+            $schema
                 ->toBeInstanceOf(Schema::class)
-                ->getType($type)
+                ->and($schema->value->getType($type))
                 ->toBeInstanceOf(Type::class);
         } catch (Error $caught) {
             throw new ExpectationFailedException($caught->getMessage(), null, $caught);
@@ -92,27 +97,22 @@ trait GraphQl
          */
         expect($response)
             ->toBeInstanceOf(ResponseInterface::class)
-            ->getStatusCode()
+            ->and($response->getStatusCode())
             ->toBe(200)
-            ->getReasonPhrase()
+            ->and($response->getReasonPhrase())
             ->toBe('OK')
-            ->getHeaderLine('content-type')
+            ->and($response->getHeaderLine('content-type'))
             ->toContain('json');
 
-        $body = $response->getBody();
+        $body = self::body($response);
+        $json = expect($body)->json();
 
-        $body->rewind();
-
-        $payload = $body->getContents();
-
-        expect($payload)
-            ->json()
-            ->each(function (Expectation $value): Expectation {
+        $json
+            ->each(static function (Expectation $value): Expectation {
                 return $value->toBeArray();
             })
-            ->and(count(json_decode($payload, true)))
-            ->toBeLessThanOrEqual(2)
-            ->and($response);
+            ->and(count($json->value))
+            ->toBeLessThanOrEqual(2);
 
         return $this;
     }
@@ -126,14 +126,12 @@ trait GraphQl
         /**
          * @var self|TestCase $this
          */
-        $body = $response->getBody();
+        expect($response)->toBeGraphQlResponse();
 
-        $body->rewind();
+        $json = expect(self::body($response))->json();
 
-        expect($body->getContents())
-            ->json()
-            ->toHaveKey('data')
-            ->data
+        $json->toHaveKey('data')
+            ->and($json->value['data'])
             ->toEqualCanonicalizing($data);
 
         return $this;
@@ -148,31 +146,30 @@ trait GraphQl
         /**
          * @var self|TestCase $this
          */
-        $body = $response->getBody();
+        expect($response)->toBeGraphQlResponse();
 
-        $body->rewind();
+        $json = expect(self::body($response))->json();
 
-        expect($body->getContents())
-            ->json()
-            ->toHaveKey('errors')
-            ->errors
+        $json->toHaveKey('errors')
+            ->and($json->value['errors'])
             ->toEqualCanonicalizing($errors);
 
         return $this;
     }
 
+    /**
+     * @param ResponseInterface $response A server response instance from a GraphQL API
+     * @param string            $path     A dot-delimited string of fields ("dot notation") that point to a value in the response
+     * @param mixed             $value    An optional value to assert at the given path, should it exist
+     */
     public function toHavePath($response, string $path, $value = null): TestCase
     {
-        expect($response)->toBeGraphQlResponse();
-
         /**
          * @var self|TestCase $this
          */
-        $body = $response->getBody();
-
-        $body->rewind();
-
-        expect($body->getContents())
+        expect($response)
+            ->toBeGraphQlResponse()
+            ->and(self::body($response))
             ->json()
             ->toHaveKey(...array_filter([
                 sprintf('data.%s', $path),
@@ -180,5 +177,24 @@ trait GraphQl
             ]));
 
         return $this;
+    }
+
+    /**
+     * Read the contents and the response body. The body is rewound after
+     * reading as to not cause any potential issues for user calls.
+     *
+     * @param ResponseInterface $response A PSR-7 response instance
+     */
+    private static function body(ResponseInterface $response): string
+    {
+        $body = $response->getBody();
+
+        $body->rewind();
+
+        $payload = $body->getContents();
+
+        $body->rewind();
+
+        return $payload;
     }
 }
