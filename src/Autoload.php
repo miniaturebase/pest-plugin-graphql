@@ -23,7 +23,7 @@ function schema($document = '')
     return test()->schema($document);
 }
 
-expect()->extend('schema', function ($document = null): Expectation {
+expect()->extend('schema', function ($document = null) {
     return schema($document);
 });
 

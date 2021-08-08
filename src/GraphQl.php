@@ -117,13 +117,11 @@ trait GraphQl
 
         $json = json_decode($body, true);
 
-        expect($json)
-            // TODO: assert keys
-            ->each(static function (Expectation $value): Expectation {
-                return $value->toBeArray();
-            })
-            ->and(count($json))
-            ->toBeLessThanOrEqual(2);
+        expect(count($json))->toBeLessThanOrEqual(2);
+
+        foreach (array_values($json) as $node) {
+            expect($node)->toBeArray();
+        }
 
         return $this;
     }
